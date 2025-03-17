@@ -1,4 +1,5 @@
 import requests
+import sqlite3
 # We want to create a set of pokedex tables with the following columns:
 # id    name    type_1  type_2  evo_id
 # We want to be able to save these in either an sqlite db (default)
@@ -15,8 +16,48 @@ GENERATION_ID_RANGES = {
 }
 
 
-def makePokedex():
-    return 0
+def makePokedex(database_name: str, pokedex_name: str, pokedex_gen: int):
+    con = sqlite3.connect(database_name)
+    cur = con.cursor()
+
+    # Please don't SQL inject yourself. Do drugs with friends instead!
+    try:
+        cur.execute("CREATE TABLE IF NOT EXISTS " +
+                    noSQLInjects(pokedex_name) +
+                    "(id INTEGER PRIMARY KEY, name TEXT UNIQUE NOT NULL, " +
+                    "type_1 TEXT NOT NULL, type_2 TEXT, evo_id INTEGER);")
+    except sqlite3.Error as error:
+        print(error)
+
+
+def insertIntoPokedex(database_name: str, pokedex_name: str, pokedex_gen: int):
+    con = sqlite3.connect(database_name)
+    cur = con.cursor()
+    curr_id = GENERATION_ID_RANGES[pokedex_gen][0]
+    end = GENERATION_ID_RANGES[pokedex_gen][1]
+    while (curr_id <= end):
+        poke_dict = getPokemonById(curr_id)
+        query = generateSQLForPokedexInsert(pokedex_name, poke_dict)
+        try:
+            cur.execute(query[0], query[1])
+        except sqlite3.Error:
+            print(f"Failed to insert {poke_dict["name"]}")
+        curr_id += 1
+    cur.close()
+
+
+def generateSQLForPokedexInsert(pokedex_name: str, poke_info: dict):
+    if len(poke_info['types']) > 1:
+        query = "INSERT INTO " + noSQLInjects(pokedex_name) + \
+                " (id, name, type_1, type_2, evo_id) values (?,?,?,?,?);"
+        values = (poke_info["id"], poke_info["name"], poke_info["types"][0],
+                  poke_info["types"][1], poke_info["evo_id"])
+    else:
+        query = "INSERT INTO " + noSQLInjects(pokedex_name) + \
+            " (id, name, type_1, evo_id) values (?,?,?,?);"
+        values = (poke_info["id"], poke_info["name"], poke_info["types"][0],
+                  poke_info["evo_id"])
+    return query, values
 
 
 def getPokemonById(id: int) -> dict:
@@ -55,3 +96,13 @@ def stripEvoIdFromURL(url: str) -> int:
     parts = url.split("/")
     id = parts[-2]
     return int(id)
+
+
+def noSQLInjects(phrase: str) -> str:
+    return ''.join(chr for chr in phrase if chr.isalnum())
+
+
+database_name = "Pokemon.db"
+pokedex_name = "Gen_1_Dex"
+makePokedex(database_name, pokedex_name, 1)
+insertIntoPokedex(database_name, pokedex_name, 1)
