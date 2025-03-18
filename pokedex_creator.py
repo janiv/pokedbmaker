@@ -28,6 +28,8 @@ def makePokedex(database_name: str, pokedex_name: str, pokedex_gen: int):
                     "type_1 TEXT NOT NULL, type_2 TEXT, evo_id INTEGER);")
     except sqlite3.Error as error:
         print(error)
+    cur.close()
+    con.commit()
 
 
 def insertIntoPokedex(database_name: str, pokedex_name: str, pokedex_gen: int):
@@ -39,11 +41,17 @@ def insertIntoPokedex(database_name: str, pokedex_name: str, pokedex_gen: int):
         poke_dict = getPokemonById(curr_id)
         query = generateSQLForPokedexInsert(pokedex_name, poke_dict)
         try:
-            cur.execute(query[0], query[1])
+            cur.execute(f"{query[0]}", query[1])
+            print(f"Succesfully inserted {poke_dict["name"]}")
         except sqlite3.Error:
             print(f"Failed to insert {poke_dict["name"]}")
+            curr_id += 1
+            continue
         curr_id += 1
+    con.commit()
     cur.close()
+
+    con.close()
 
 
 def generateSQLForPokedexInsert(pokedex_name: str, poke_info: dict):
@@ -51,12 +59,12 @@ def generateSQLForPokedexInsert(pokedex_name: str, poke_info: dict):
         query = "INSERT INTO " + noSQLInjects(pokedex_name) + \
                 " (id, name, type_1, type_2, evo_id) values (?,?,?,?,?);"
         values = (poke_info["id"], poke_info["name"], poke_info["types"][0],
-                  poke_info["types"][1], poke_info["evo_id"])
+                  poke_info["types"][1], poke_info["evo_id"],)
     else:
         query = "INSERT INTO " + noSQLInjects(pokedex_name) + \
             " (id, name, type_1, evo_id) values (?,?,?,?);"
         values = (poke_info["id"], poke_info["name"], poke_info["types"][0],
-                  poke_info["evo_id"])
+                  poke_info["evo_id"],)
     return query, values
 
 
