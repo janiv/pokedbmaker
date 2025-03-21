@@ -57,7 +57,7 @@ def insertIntoPokedex(database_name: str, pokedex_name: str, pokedex_gen: int):
 def generateSQLForPokedexInsert(pokedex_name: str, poke_info: dict):
     if len(poke_info['types']) > 1:
         query = "INSERT INTO " + noSQLInjects(pokedex_name) + \
-                " (id, name, type_1, type_2, evo_id) values (?,?,?,?,?);"
+                " (id, name, type_1, type_2, evo_id) values (?,?,?,?,?) ON CONFLICT IGNORE;"
         values = (poke_info["id"], poke_info["name"], poke_info["types"][0],
                   poke_info["types"][1], poke_info["evo_id"],)
     else:
