@@ -1,0 +1,11 @@
+.gitignore
+README.md
+pyproject.toml
+pokedbmaker/__init__.py
+pokedbmaker/__main__.py
+pokedbmaker/pokedex_creator.py
+pokedbmaker.egg-info/PKG-INFO
+pokedbmaker.egg-info/SOURCES.txt
+pokedbmaker.egg-info/dependency_links.txt
+pokedbmaker.egg-info/requires.txt
+pokedbmaker.egg-info/top_level.txt

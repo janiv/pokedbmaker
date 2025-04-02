@@ -1,3 +1,13 @@
+Metadata-Version: 2.4
+Name: pokedbmaker
+Version: 0.0.0
+Summary: A cli tool to create a local sqlite pokedex from PokeAPI data with some corrections.
+Author: Jani vilkki
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Requires-Dist: requests
+Requires-Dist: click
+
 # Pokemon Database Maker
 I needed a way to create Pokemon databases for a personal project I have been 
 working on. I have already made a similar project in the past but it is 

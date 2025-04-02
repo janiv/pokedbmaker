@@ -1,0 +1,17 @@
+[build-system]
+requires=["setuptools", "setuptools-scm"]
+build-backend="setuptools.build_meta"
+
+[project]
+name = "pokedbmaker"
+version = '0.0.0'
+authors = [
+    {name="Jani Vilkki"},
+]
+description = "A cli tool to create a local sqlite pokedex from PokeAPI data with some corrections."
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "requests",
+    "click"
+]
