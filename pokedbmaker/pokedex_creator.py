@@ -43,10 +43,8 @@ def insertIntoPokedex(database_name: str, pokedex_name: str, pokedex_gen: int):
         try:
             cur.execute(f"{query[0]}", query[1])
             print(f"Succesfully inserted {poke_dict["name"]}")
-        except sqlite3.Error:
-            print(f"Failed to insert {poke_dict["name"]}")
-            curr_id += 1
-            continue
+        except sqlite3.Error as error:
+            print(f"Failed to insert {poke_dict["name"]} due to {error}.")
         curr_id += 1
     con.commit()
     cur.close()
@@ -57,7 +55,7 @@ def insertIntoPokedex(database_name: str, pokedex_name: str, pokedex_gen: int):
 def generateSQLForPokedexInsert(pokedex_name: str, poke_info: dict):
     if len(poke_info['types']) > 1:
         query = "INSERT INTO " + noSQLInjects(pokedex_name) + \
-                " (id, name, type_1, type_2, evo_id) values (?,?,?,?,?) ON CONFLICT IGNORE;"
+                " (id, name, type_1, type_2, evo_id) values (?,?,?,?,?);"
         values = (poke_info["id"], poke_info["name"], poke_info["types"][0],
                   poke_info["types"][1], poke_info["evo_id"],)
     else:
@@ -100,6 +98,29 @@ def getPokemonById(id: int) -> dict:
     return res
 
 
+def getPokemonFromDBById(id: int, pokedex_name: str,
+                         database_name: str) -> str:
+    con = sqlite3.connect(database_name)
+    cur = con.cursor()
+    query = "SELECT * FROM " + noSQLInjects(pokedex_name) + \
+        " WHERE id = " + noSQLInjects(str(id)) + ";"
+    print(query)
+    try:
+        cur.execute(query)
+        con.commit()
+        row = cur.fetchone()
+        print(f"Row: {row}")
+        cur.close()
+    except sqlite3.Error as error:
+        print(error)
+        return "Something went wrong"
+    finally:
+        if con:
+            con.close()
+            print("Closed sqlite connection")
+    return row
+
+
 def stripEvoIdFromURL(url: str) -> int:
     parts = url.split("/")
     id = parts[-2]
@@ -114,3 +135,6 @@ database_name = "Pokemon.db"
 pokedex_name = "Gen_1_Dex"
 makePokedex(database_name, pokedex_name, 1)
 insertIntoPokedex(database_name, pokedex_name, 1)
+res = getPokemonFromDBById(id=4, pokedex_name=pokedex_name,
+                           database_name=database_name)
+print(res)
