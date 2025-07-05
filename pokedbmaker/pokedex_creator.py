@@ -1,5 +1,6 @@
 import requests
 import sqlite3
+import click
 # We want to create a set of pokedex tables with the following columns:
 # id    name    type_1  type_2  evo_id
 # We want to be able to save these in either an sqlite db (default)
@@ -65,6 +66,9 @@ def generateSQLForPokedexInsert(pokedex_name: str, poke_info: dict):
                   poke_info["evo_id"],)
     return query, values
 
+@click.command()
+def testFunc():
+    print("This is the test function")
 
 def getPokemonById(id: int) -> dict:
     res = {}
@@ -130,11 +134,3 @@ def stripEvoIdFromURL(url: str) -> int:
 def noSQLInjects(phrase: str) -> str:
     return ''.join(chr for chr in phrase if chr.isalnum())
 
-
-database_name = "Pokemon.db"
-pokedex_name = "Gen_1_Dex"
-makePokedex(database_name, pokedex_name, 1)
-insertIntoPokedex(database_name, pokedex_name, 1)
-res = getPokemonFromDBById(id=4, pokedex_name=pokedex_name,
-                           database_name=database_name)
-print(res)
