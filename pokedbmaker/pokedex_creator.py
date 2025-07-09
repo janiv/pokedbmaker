@@ -67,8 +67,12 @@ def generateSQLForPokedexInsert(pokedex_name: str, poke_info: dict):
     return query, values
 
 @click.command()
-def testFunc():
+@click.option('--dbname', prompt='Enter database name, program will create a new one if it does not exist', help="Reminder you need sqlite installed")
+@click.option('--gen', prompt='Enter pokemon Generation 1-6', help='Enter number from 1-6 to choose a generation of pokemon')
+def testFunc(dbname,gen):
     print("This is the test function")
+    print(f"You want to use database: {dbname}.db")
+    print(f"You want to generate a pokedex for Generation {gen}")
 
 def getPokemonById(id: int) -> dict:
     res = {}
