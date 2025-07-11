@@ -1,6 +1,5 @@
 import requests
 import sqlite3
-import click
 # We want to create a set of pokedex tables with the following columns:
 # id    name    type_1  type_2  evo_id
 # We want to be able to save these in either an sqlite db (default)
@@ -65,14 +64,6 @@ def generateSQLForPokedexInsert(pokedex_name: str, poke_info: dict):
         values = (poke_info["id"], poke_info["name"], poke_info["types"][0],
                   poke_info["evo_id"],)
     return query, values
-
-@click.command()
-@click.option('--dbname', prompt='Enter database name, program will create a new one if it does not exist', help="Reminder you need sqlite installed")
-@click.option('--gen', prompt='Enter pokemon Generation 1-6', help='Enter number from 1-6 to choose a generation of pokemon')
-def testFunc(dbname,gen):
-    print("This is the test function")
-    print(f"You want to use database: {dbname}.db")
-    print(f"You want to generate a pokedex for Generation {gen}")
 
 def getPokemonById(id: int) -> dict:
     res = {}
