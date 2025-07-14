@@ -11,7 +11,13 @@ def command_create_dex(dbname,gen):
     print(f"You want to generate a pokedex for Generation {gen}")
 
 @click.command()
-@click.option('--')
+@click.option('--gen', prompt='Enter pokedex gen', help='Enter a number 1-6')
 @click.option('--dexnum', prompt='Enter pokedex id of pokemon to look up', help='Gen 1 ranges from 1-151, Gen 2 ranges from 1-251')
 def command_lookup_by_dex_id(gen, dexnum):
     print(f"Looking up {dexnum} in {gen} dex")
+
+
+@click.command()
+@click.option('--')
+def command_create_routes_list(dbname, gen, game):
+    print(f"Creating {game} routes list using {gen} dex and db: {dbname}")
