@@ -15,7 +15,6 @@ GENERATION_ID_RANGES = {
     6: [1, 721]
 }
 
-
 def makePokedex(database_name: str, pokedex_name: str, pokedex_gen: int):
     con = sqlite3.connect(database_name)
     cur = con.cursor()
@@ -43,8 +42,10 @@ def insertIntoPokedex(database_name: str, pokedex_name: str, pokedex_gen: int):
         try:
             cur.execute(f"{query[0]}", query[1])
             print(f"Succesfully inserted {poke_dict["name"]}")
-        except sqlite3.Error as error:
-            print(f"Failed to insert {poke_dict["name"]} due to {error}.")
+        except sqlite3.Error:
+            print(f"Failed to insert {poke_dict["name"]}")
+            curr_id += 1
+            continue
         curr_id += 1
     con.commit()
     cur.close()
@@ -55,7 +56,7 @@ def insertIntoPokedex(database_name: str, pokedex_name: str, pokedex_gen: int):
 def generateSQLForPokedexInsert(pokedex_name: str, poke_info: dict):
     if len(poke_info['types']) > 1:
         query = "INSERT INTO " + noSQLInjects(pokedex_name) + \
-                " (id, name, type_1, type_2, evo_id) values (?,?,?,?,?);"
+                " (id, name, type_1, type_2, evo_id) values (?,?,?,?,?) ON CONFLICT IGNORE;"
         values = (poke_info["id"], poke_info["name"], poke_info["types"][0],
                   poke_info["types"][1], poke_info["evo_id"],)
     else:
@@ -64,6 +65,7 @@ def generateSQLForPokedexInsert(pokedex_name: str, poke_info: dict):
         values = (poke_info["id"], poke_info["name"], poke_info["types"][0],
                   poke_info["evo_id"],)
     return query, values
+
 
 def getPokemonById(id: int) -> dict:
     res = {}
@@ -95,29 +97,6 @@ def getPokemonById(id: int) -> dict:
     evo_id_url = species_data["evolution_chain"]["url"]
     res["evo_id"] = stripEvoIdFromURL(evo_id_url)
     return res
-
-
-def getPokemonFromDBById(id: int, pokedex_name: str,
-                         database_name: str) -> str:
-    con = sqlite3.connect(database_name)
-    cur = con.cursor()
-    query = "SELECT * FROM " + noSQLInjects(pokedex_name) + \
-        " WHERE id = " + noSQLInjects(str(id)) + ";"
-    print(query)
-    try:
-        cur.execute(query)
-        con.commit()
-        row = cur.fetchone()
-        print(f"Row: {row}")
-        cur.close()
-    except sqlite3.Error as error:
-        print(error)
-        return "Something went wrong"
-    finally:
-        if con:
-            con.close()
-            print("Closed sqlite connection")
-    return row
 
 
 def stripEvoIdFromURL(url: str) -> int:

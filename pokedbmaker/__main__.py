@@ -1,7 +1,7 @@
-from pokedex_creator import *
+from commands import *
 
 def main():
-    print(0)
+    cli()
 
 
 if __name__ == '__main__':
