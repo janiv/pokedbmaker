@@ -31,6 +31,32 @@ def command_lookup_by_dex_id(gen, dexnum):
 def command_create_routes_list(dbname, gen, game):
     print(f"Creating {game} routes list using {gen} dex and db: {dbname}")
 
+
+@click.command()
+@click.option('--gen', prompt="Enter pokedex gen", type=click.INT, help="Enter number from 1-6")
+@click.option('--dexnum',
+              prompt="Enter pokedex number of pokemon to update",
+              type=click.INT,
+              help="Enter a number")
+@click.option('--new_name', 
+              prompt="Enter updated name", 
+              type=click.STRING,
+              help="If no update just enter old name")
+@click.option('--new_type1', 
+              prompt="Enter updated type1", 
+              type=click.STRING,
+              help="If no update just enter old name")
+@click.option('--new_type2', 
+              prompt="Enter updated type2", 
+              type=click.STRING,
+              help="If no update just enter old name")
+def command_update_pokedex(gen, dexnum, new_name, new_type1, new_type2):
+    print(f"Updating pokemon num: {dexnum} in pokedex gen {gen}")
+    print(f"New name: {new_name} type1:{new_type1} type2:{new_type2}")
+
+
+
 cli.add_command(command_create_dex)
 cli.add_command(command_lookup_by_dex_id)
 cli.add_command(command_create_routes_list)
+cli.add_command(command_update_pokedex)
